@@ -7,12 +7,15 @@ from setuptools import setup
 import csvfile as mod
 
 if sys.argv[-1] == "publish":
+    err = os.system("pytest")
+    if err:
+        exit(err)
     os.system("python setup.py bdist_wheel")
     os.system("python -m twine upload dist/*")
     sys.exit(0)
 
 
-with open("README.rst", "rt") as f:
+with open("README.md", "rt") as f:
     readme = f.read()
 
 
@@ -22,6 +25,7 @@ setup(
     version=mod.__version__,
     description=readme.split("===\n")[1].strip().split("\n\n")[0],
     long_description=readme,
+    long_description_content_type="text/markdown",
     py_modules=[mod.__name__],
     author="Imbolc",
     author_email="imbolc@imbolc.name",
@@ -33,4 +37,5 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
     ],
+    setup_requires=['wheel'],
 )

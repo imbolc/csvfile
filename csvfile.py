@@ -3,32 +3,41 @@ from __future__ import annotations
 import csv
 import os
 from pathlib import Path
-from typing import Optional, Sequence, Union
+from typing import TYPE_CHECKING, Optional, Sequence, Type, Union
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
+
+
+if TYPE_CHECKING:
+    import pydantic
 
 
 def load(
     filename: Union[Path, str],
-    fieldnames: Optional[Sequence[str]] = None,
     *,
+    model: Optional[Type[pydantic.BaseModel]] = None,
+    fieldnames: Optional[Sequence[str]] = None,
     encoding: str = "utf-8",
 ) -> CSVFile:
-    return CSVFile(filename, fieldnames, encoding=encoding).load()
+    return CSVFile(filename, model=model, fieldnames=fieldnames, encoding=encoding).load()
 
 
 class CSVFile(list):
     def __init__(
         self,
         filename: Union[Path, str],
-        fieldnames: Optional[Sequence[str]] = None,
         *,
+        model: Optional[Type[pydantic.BaseModel]] = None,
+        fieldnames: Optional[Sequence[str]] = None,
         encoding: str = "utf-8",
     ):
         super().__init__()
         self.path = Path(filename)
-        self.fieldnames = fieldnames
+        if fieldnames and model:
+            raise ValueError("Passing both `model` and `fieldnames` doesn't make sense")
         self.encoding = encoding
+        self.model = model
+        self.fieldnames = list(model.__fields__.keys()) if model else fieldnames
 
     def load(self) -> CSVFile:
         self.clear()
@@ -36,8 +45,9 @@ class CSVFile(list):
             return self
         with self.path.open(encoding=self.encoding) as f:
             reader = csv.DictReader(f)
-            for i, row in enumerate(reader):
-                self.append(row)
+            for row in reader:
+                obj = self.model(**row) if self.model else row
+                self.append(obj)
             self.fieldnames = reader.fieldnames
         return self
 
@@ -52,7 +62,7 @@ class CSVFile(list):
             )
             if self.fieldnames:
                 writer.writeheader()
-            writer.writerows(self)
+            writer.writerows(dict(x) for x in self)
 
 
 if __name__ == "__main__":
