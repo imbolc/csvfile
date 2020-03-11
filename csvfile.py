@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Sequence, Type, Union
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 
 if TYPE_CHECKING:
