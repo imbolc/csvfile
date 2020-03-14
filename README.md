@@ -48,6 +48,17 @@ types checking and conversion:
 [Transaction(amount=Decimal('10.5'), at=datetime.datetime(2020, 3, 11, 14, 13, 31, 87455))]
 ```
 
+Tip: to annotate only a part of columns you can use
+[pydantic.config.extra](https://pydantic-docs.helpmanual.io/usage/model_config/)
+attribute:
+
+```python
+class Transaction(pydantic.BaseModel):
+    ...
+    class Config:
+        extra = 'allow'
+```
+
 Running tests
 -------------
     pip install -r requirements-dev.txt
