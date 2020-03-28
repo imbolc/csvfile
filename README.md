@@ -28,7 +28,7 @@ with open("my-data.csv, "w") as f:
     writer.writerows(data)
 ```
 
-Also you can you can declaratevely define types in a table header:
+Also you can declaratively define types in a table's header:
 
 ```python
 >>> print(open("/tmp/csvfile_test.csv").read())
@@ -50,16 +50,16 @@ the header as `created:i`.
 Built-in types
 --------------
 
-| Type     | Alias | Comment                                                                                                                                  |
-|----------|-------|------------------------------------------------------------------------------------------------------------------------------------------|
-| str      | s     | default, if no type specified                                                                                                            |
-| bool     | b     | reader can understand next pairs as `True / False` case-insensitevely: `true / false`, `t / f`, `1 / 0`, `y / n`, `yes / no`, `on / off` |
-| int      | i     |                                                                                                                                          |
-| float    | f     |                                                                                                                                          |
-| decimal  | n     |                                                                                                                                          |
-| date     | d     | ISO 8601, YYYY-MM-DD                                                                                                                     |
-| datetime | t     | ISO 8601, YYYY-MM-DDTHH:MM:SS.ffffff                                                                                                     |
-| json     | j     |                                                                                                                                          |
+| Type     | Alias | Comment                                                                                                                                                                                                     |
+|----------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| str      | s     | default, if no type specified                                                                                                                                                                               |
+| bool     | b     | `reader` can understand next pairs as `True / False` case-insensitevely: `true / false`, `t / f`, `1 / 0`, `y / n`, `yes / no`, `on / off`, but the `writer` will always stringify them into `true / false` |
+| int      | i     |                                                                                                                                                                                                             |
+| float    | f     |                                                                                                                                                                                                             |
+| decimal  | n     |                                                                                                                                                                                                             |
+| date     | d     | ISO 8601, YYYY-MM-DD                                                                                                                                                                                        |
+| datetime | t     | ISO 8601, YYYY-MM-DDTHH:MM:SS.ffffff                                                                                                                                                                        |
+| json     | j     |                                                                                                                                                                                                             |
 
 Empty cells will become `None` for any type except of `str`.
 As in case of `str` there's no way to distinguish it from an empty string.
