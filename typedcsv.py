@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import csv
+import decimal
 import json
 from datetime import date, datetime
-from decimal import Decimal
 from typing import IO, Any, Callable, Iterable, List, NamedTuple, Sequence, Set
 
 
 class CellType(NamedTuple):
     name: str
-    aliases: Set[str]
+    aliases: Set[Any]
     loads: Callable
     dumps: Callable
 
@@ -21,14 +21,45 @@ class CellType(NamedTuple):
         raise TypeError(f"Unknown cell type: {name}")
 
 
+class Boolean:
+    STR_MAP = {
+        "true": True,
+        "false": False,
+        "t": True,
+        "f": False,
+        "1": True,
+        "0": False,
+        "y": True,
+        "n": False,
+        "yes": True,
+        "no": False,
+        "on": True,
+        "off": False,
+    }
+
+    @classmethod
+    def loads(cls, s: str) -> bool:
+        try:
+            return cls.STR_MAP[s.lower().strip()]
+        except KeyError:
+            raise ValueError("Can't convert `{s}` into boolean")
+
+    @classmethod
+    def dumps(cls, val: bool) -> str:
+        return str(bool(val)).lower()
+
+
 TYPES = [
-    CellType("str", {"s"}, str, str),
-    CellType("int", {"i"}, int, str),
-    CellType("float", {"f"}, float, str),
-    CellType("decimal", {"n"}, Decimal, str),
-    CellType("date", {"d"}, date.fromisoformat, date.isoformat),
-    CellType("datetime", {"t"}, datetime.fromisoformat, datetime.isoformat),
-    CellType("json", {"j"}, json.loads, json.dumps),
+    CellType("str", {"s", str}, str, str),
+    CellType("bool", {"b", "boolean", bool}, Boolean.loads, Boolean.dumps),
+    CellType("int", {"i", int}, int, str),
+    CellType("float", {"f", float}, float, str),
+    CellType("decimal", {"n", decimal, decimal.Decimal}, decimal.Decimal, str),
+    CellType("date", {"d", date}, date.fromisoformat, date.isoformat),
+    CellType(
+        "datetime", {"t", datetime}, datetime.fromisoformat, datetime.isoformat
+    ),
+    CellType("json", {"j", json}, json.loads, json.dumps),
 ]
 
 
@@ -71,13 +102,8 @@ def reader(
     **fmtparams: dict,
 ) -> Iterable[List[Any]]:
     cell_types = [CellType.get(t) for t in types]
-    len_types = len(cell_types)
     for i, row in enumerate(csv.reader(csvfile, dialect, **fmtparams)):
-        if len(row) != len_types:
-            raise ValueError(
-                f"Length of the row #{i} is {len(row)} "
-                f"while you {len_types} types provided"
-            )
+        _check_row_length(i, row, cell_types)
         yield [t.loads(s) for t, s in zip(cell_types, row)]
 
 
@@ -105,15 +131,12 @@ def writer(
     return TypedWriter(csvfile, types, dialect, **fmtparams)
 
 
+# TODO: dict reader
+
+
 def _check_row_length(row_num: int, row: Sequence, types: Sequence) -> None:
     if len(row) != len(types):
         raise ValueError(
             f"Length of the row #{row_num} is {len(row)} "
             f"while you {len(types)} types provided"
         )
-
-
-if __name__ == "__main__":
-    import doctest
-
-    print(doctest.testmod(optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
