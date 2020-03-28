@@ -10,7 +10,6 @@ data[0]["field"] = "new value"
 data.sync()
 ```
 
-
 Instead of:
 
 ```python
@@ -29,35 +28,42 @@ with open("my-data.csv, "w") as f:
     writer.writerows(data)
 ```
 
-Typing
-------
-
-You also can provide a model based on `pydantic.BaseModel`. This will give you
-types checking and conversion:
+Also you can you can declaratevely define types in a table header:
 
 ```python
->>> import csvfile, pydantic, decimal, datetime
->>> class Transaction(pydantic.BaseModel):
-...     amount: decimal.Decimal
-...     at: datetime.datetime
->>> table = csvfile.CSVFile("./transactions.csv", model=Transaction)
->>> table.append(Transaction(amount="10.5", at=datetime.datetime.now()))
->>> open("./transactions.csv").read()
-'amount,at\n10.5,2020-03-11 14:13:31.087455\n'
->>> csvfile.load("./transactions.csv", model=Transaction)
-[Transaction(amount=Decimal('10.5'), at=datetime.datetime(2020, 3, 11, 14, 13, 31, 87455))]
+>>> print(open("/tmp/csvfile_test.csv").read())
+language,created:i
+python,1991
+js,1995
+rust,2010
+
+>>> pprint(csvfile.load("/tmp/csvfile_test.csv"))
+[{'created': 1991, 'language': 'python'},
+ {'created': 1995, 'language': 'js'},
+ {'created': 2010, 'language': 'rust'}]
 ```
 
-Tip: to annotate only a part of columns you can use
-[pydantic.config.extra](https://pydantic-docs.helpmanual.io/usage/model_config/)
-attribute:
+Notice, that `created` is automatically converted into integer as we typed it in
+the header as `created:i`.
 
-```python
-class Transaction(pydantic.BaseModel):
-    ...
-    class Config:
-        extra = 'allow'
-```
+
+Built-in types
+--------------
+
+| Type     | Alias | Comment                                                                                                                                  |
+|----------|-------|------------------------------------------------------------------------------------------------------------------------------------------|
+| str      | s     | default, if no type specified                                                                                                            |
+| bool     | b     | reader can understand next pairs as `True / False` case-insensitevely: `true / false`, `t / f`, `1 / 0`, `y / n`, `yes / no`, `on / off` |
+| int      | i     |                                                                                                                                          |
+| float    | f     |                                                                                                                                          |
+| decimal  | n     |                                                                                                                                          |
+| date     | d     | ISO 8601, YYYY-MM-DD                                                                                                                     |
+| datetime | t     | ISO 8601, YYYY-MM-DDTHH:MM:SS.ffffff                                                                                                     |
+| json     | j     |                                                                                                                                          |
+
+Empty cells will become `None` for any type except of `str`.
+As in case of `str` there's no way to distinguish it from an empty string.
+
 
 Running tests
 -------------
