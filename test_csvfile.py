@@ -128,13 +128,19 @@ def test_dictreader_empty_file():
         list(DictReader(f))
 
 
-def test_dict_load():
+def test_load():
     save_test_text()
     table = load(PATH)
     assert json.dumps(table) == json.dumps(TEST_DATA)
 
 
-def test_dict_sync():
+def test_load_limit():
+    save_test_text()
+    table = load(PATH, limit=1)
+    assert len(table) == 1
+
+
+def test_sync():
     save_test_text()
     table = load(PATH)
     table.sync()

@@ -65,6 +65,24 @@ Empty cells will become `None` for any type except of `str`.
 As in case of `str` there's no way to distinguish it from an empty string.
 
 
+API
+---
+The api consists in a single function `load` with the signature:
+
+```python
+table = load(
+    filename: Union[Path, str],   # the file should exist and contain headers
+    *csvargs: Any,                # `*args` for the standard `csv.reader`
+    limit: Optional[int] = None,  # maximum number of rows to read
+    **csvkwargs: Any,             # `**fmtparams` for the standard `csv.reader`
+)
+```
+
+The returned object has a `list` interface with an additional `sync` method to
+save changes back into the file.
+
+
+
 Running tests
 -------------
     pip install -r requirements-dev.txt

@@ -14,16 +14,23 @@ from typing import (
     Iterator,
     List,
     NamedTuple,
+    Optional,
     Sequence,
     Set,
     Union,
 )
 
-__version__ = "3.0.1"
+__version__ = "3.1.0"
 
 
 class load(list):
-    def __init__(self, filename: Union[Path, str], *csvargs, **csvkwargs):
+    def __init__(
+        self,
+        filename: Union[Path, str],
+        *csvargs: Any,
+        limit: Optional[int] = None,
+        **csvkwargs: Any,
+    ):
         super().__init__()
         self.path = Path(filename)
         self.csvargs = csvargs
@@ -31,7 +38,9 @@ class load(list):
         with self.path.open() as f:
             reader = DictReader(f, *csvargs, **csvkwargs)
             self.header = reader.header
-            for row in reader:
+            for i, row in enumerate(reader):
+                if limit is not None and i >= limit:
+                    break
                 self.append(row)
 
     def sync(self):
