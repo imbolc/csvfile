@@ -19,7 +19,7 @@ from typing import (
     Union,
 )
 
-__version__ = "3.0.0"
+__version__ = "3.0.1"
 
 
 class load(list):
@@ -87,7 +87,7 @@ class Boolean:
         try:
             return cls.STR_MAP[s.lower().strip()]
         except KeyError:
-            raise ValueError("can't convert `{s}` into boolean")
+            raise ValueError(f"can't convert `{s}` into boolean")
 
     @classmethod
     def dumps(cls, val: bool) -> str:
