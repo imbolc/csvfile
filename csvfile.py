@@ -20,7 +20,7 @@ from typing import (
     Union,
 )
 
-__version__ = "3.2.0"
+__version__ = "3.3.0"
 
 
 class Row(dict):
@@ -31,14 +31,14 @@ class Row(dict):
     __delattr__ = dict.__delitem__  # type:ignore
 
 
-class load(list):
+class CSVFile(list):
     def __init__(
         self,
         filename: Union[Path, str],
         *csvargs: Any,
         limit: Optional[int] = None,
         **csvkwargs: Any,
-    ):
+    ) -> None:
         super().__init__()
         self.path = Path(filename)
         self.csvargs = csvargs
@@ -219,3 +219,6 @@ def _check_row_length(row_num: int, row: Sequence, types: Sequence) -> None:
             f"length of the row #{row_num} is {len(row)} "
             f"while you {len(types)} types provided"
         )
+
+
+load = CSVFile
