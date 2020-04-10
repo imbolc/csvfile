@@ -6,7 +6,7 @@ You can use:
 
 ```python
 data = csvfile.load("my-data.csv")
-data[0]["field"] = "new value"
+data[0].field = "new value"
 data.sync()
 ```
 

@@ -157,3 +157,12 @@ def test_update():
     assert len(table) == 3
     assert table[1]["language"] == "js"
     assert table[2]["created"] == 2010
+
+
+def test_row_dot_notation():
+    save_test_text()
+    table = load(PATH)
+    table[1].language = "js"
+    table.sync()
+    table = load(PATH)
+    assert table[1].language == "js"

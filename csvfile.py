@@ -20,7 +20,15 @@ from typing import (
     Union,
 )
 
-__version__ = "3.1.0"
+__version__ = "3.2.0"
+
+
+class Row(dict):
+    """A dict with a dot-access"""
+
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__  # type:ignore
+    __delattr__ = dict.__delitem__  # type:ignore
 
 
 class load(list):
@@ -59,6 +67,16 @@ class load(list):
             for row in self:
                 vals = [row[h.name] for h in self.header]
                 w.writerow(vals)
+
+    def append(self, row: Dict[str, Any]):
+        super().append(Row(row))
+
+    def extend(self, rows: Iterable[Dict[str, Any]]):
+        for row in rows:
+            self.append(row)
+
+    def insert(self, i, row):
+        super().insert(i, Row(row))
 
 
 class CellType(NamedTuple):
@@ -201,9 +219,3 @@ def _check_row_length(row_num: int, row: Sequence, types: Sequence) -> None:
             f"length of the row #{row_num} is {len(row)} "
             f"while you {len(types)} types provided"
         )
-
-
-if __name__ == "__main__":
-    import doctest
-
-    print(doctest.testmod())
