@@ -12,6 +12,8 @@ if sys.argv[-1] == "publish":
         exit(err)
     os.system("python setup.py bdist_wheel")
     os.system("python -m twine upload dist/*")
+    os.system("git push")
+    os.system("git push --tags")
     sys.exit(0)
 
 
@@ -37,5 +39,5 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
     ],
-    setup_requires=['wheel'],
+    setup_requires=["wheel"],
 )
