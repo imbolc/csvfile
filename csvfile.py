@@ -20,10 +20,10 @@ from typing import (
     Union,
 )
 
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 
 
-class Row(dict):
+class CSVRow(dict):
     """A dict with a dot-access"""
 
     __getattr__ = dict.get
@@ -69,14 +69,14 @@ class CSVFile(list):
                 w.writerow(vals)
 
     def append(self, row: Dict[str, Any]):
-        super().append(Row(row))
+        super().append(CSVRow(row))
 
     def extend(self, rows: Iterable[Dict[str, Any]]):
         for row in rows:
             self.append(row)
 
     def insert(self, i, row):
-        super().insert(i, Row(row))
+        super().insert(i, CSVRow(row))
 
 
 class CellType(NamedTuple):
